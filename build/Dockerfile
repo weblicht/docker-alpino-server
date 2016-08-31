@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
   libtk8.5 \
   locales \
   man \
+  supervisor \
   make
 
 RUN sed -e 's/^# en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen > /etc/locale.gen.tmp && \
@@ -34,11 +35,15 @@ RUN rm -rf /Alpino/create_bin/tcl8.5 /Alpino/create_bin/tk8.5
 # Remove stale nfs files
 RUN find /Alpino -name '.nfs*' | xargs rm -f
 
+RUN mkdir -p /var/log/supervisor
+
 WORKDIR /Alpino
 
 COPY libtok_breaks.so /Alpino/Tokenization/
-COPY tokenize_server /Alpino/Tokenization/tokenize_server/
-COPY start.sh /Alpino/
-RUN chmod +x start.sh
+COPY tokenize_server start.sh /Alpino/Tokenization/tokenize_server/
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY Makefile.start_server /Alpino/
+
+RUN chmod +x Tokenization/tokenize_server/start.sh
 EXPOSE 42424 42425
-CMD ["./start.sh"]
+CMD ["/usr/bin/supervisord"]

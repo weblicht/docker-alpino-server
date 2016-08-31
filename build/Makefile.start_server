@@ -1,0 +1,13 @@
+PORT=42424
+TIMEOUT=20000
+MEMLIMIT=800M
+
+## this one is for parsing
+start_server:
+	PROLOGMAXSIZE=$(MEMLIMIT) $(ALPINO_HOME)/bin/Alpino -notk -veryfast user_max=$(TIMEOUT)\
+            server_kind=parse\
+            server_port=$(PORT)\
+            assume_input_is_tokenized=on\
+            debug=1\
+	    -init_dict_p\
+            batch_command=alpino_server
